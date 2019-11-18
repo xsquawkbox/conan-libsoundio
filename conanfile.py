@@ -1,6 +1,5 @@
 from conans import ConanFile, CMake, tools
 
-
 class LibsoundioConan(ConanFile):
     name = "libsoundio"
     version = "2.0.0"
@@ -13,16 +12,26 @@ class LibsoundioConan(ConanFile):
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
+        "enable_jack": [True, False],
+        "enable_alsa": [True, False],
+        "enable_pulseaudio": [True, False],
     }
     default_options = {
         "shared": False,
         "fPIC": True,
+        "enable_jack": False,
+        "enable_alsa": True,
+        "enable_pulseaudio": True,
     }
     generators = "cmake"
 
     def configure(self):
         if self.settings.os == 'Windows':
             del self.options.fPIC
+        if self.settings.os != 'Linux':
+            del self.options.enable_jack
+            del self.options.enable_alsa
+            del self.options.enable_pulseaudio
 
     def source(self):
         git = tools.Git("libsoundio")
@@ -39,6 +48,9 @@ conan_basic_setup()''')
             # Examples & Tests fail on windows due to no unistd.h
             'BUILD_EXAMPLE_PROGRAMS': False,
             'BUILD_TESTS': False,
+            'ENABLE_JACK': False,
+            'ENABLE_PULSEAUDIO': False,
+            'ENABLE_ALSA': False,
         }
         if self.options.shared:
             build_defs['BUILD_DYNAMIC_LIBS'] = True
@@ -46,6 +58,19 @@ conan_basic_setup()''')
         else:
             build_defs['BUILD_DYNAMIC_LIBS'] = False
             build_defs['BUILD_STATIC_LIBS'] = True
+        if 'enable_jack' in self.options:
+            build_defs['ENABLE_JACK'] = self.options.enable_jack
+        if 'enable_pulseaudio' in self.options:
+            build_defs['ENABLE_PULSEAUDIO'] = self.options.enable_pulseaudio
+        if 'enable_alsa' in self.options:
+            build_defs['ENALBE_ALSA'] = self.options.enable_alsa
+        if self.settings.os == 'Windows':
+            build_defs['ENABLE_COREAUDIO'] = False
+        elif self.settings.os == 'Macos':
+            build_defs['ENABLE_WASAPI'] = False
+        else:
+            build_defs['ENABLE_COREAUDIO'] = False
+            build_defs['ENABLE_WASAPI'] = False
         cmake = CMake(self)
         cmake.configure(defs=build_defs, source_folder="libsoundio")
         return cmake
