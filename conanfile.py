@@ -92,3 +92,12 @@ conan_basic_setup()''')
         self.cpp_info.libs = ["soundio"]
         if not self.options.shared:
             self.cpp_info.defines += ['SOUNDIO_STATIC_LIBRARY']
+            if self.settings.os == 'Macos':
+                self.cpp_info.frameworks += ['CoreAudio', 'AudioUnit', 'CoreFoundation']
+            if self.settings.os == 'Linux':
+                if self.options.enable_jack:
+                    self.cpp_info.libs += ['jack']
+                if self.options.enable_pulseaudio:
+                    self.cpp_info.libs += ['pulse']
+                if self.options.enable_alsa:
+                    self.cpp_info.libs += ['asound']
