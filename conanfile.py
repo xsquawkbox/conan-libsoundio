@@ -63,7 +63,7 @@ conan_basic_setup()''')
         if 'enable_pulseaudio' in self.options:
             build_defs['ENABLE_PULSEAUDIO'] = self.options.enable_pulseaudio
         if 'enable_alsa' in self.options:
-            build_defs['ENALBE_ALSA'] = self.options.enable_alsa
+            build_defs['ENABLE_ALSA'] = self.options.enable_alsa
         if self.settings.os == 'Windows':
             build_defs['ENABLE_COREAUDIO'] = False
         elif self.settings.os == 'Macos':
