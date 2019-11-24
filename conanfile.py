@@ -101,3 +101,4 @@ conan_basic_setup()''')
                     self.cpp_info.libs += ['pulse']
                 if self.options.enable_alsa:
                     self.cpp_info.libs += ['asound']
+                self.cpp_info.libs += ['pthread']
